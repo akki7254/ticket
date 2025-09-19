@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Support Center</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" style="max-width: 500px;">
+        <header>
+            <h1>Support Center</h1>
+        </header>
+        <main class="card">
+            <h2>View Tickets or Create a New Request</h2>
+            <p style="color: #5e6c84; margin-bottom: 25px;">Please enter your email address to continue.</p>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                </div>
+                <button type="submit" class="submit-btn">Continue</button>
+            </form>
+        </main>
+    </div>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            const email = document.getElementById('email').value;
+            if (email) {
+                window.location.href = `ticket.html?email=${encodeURIComponent(email)}`;
+            }
+        });
+    </script>
+</body>
+</html>
