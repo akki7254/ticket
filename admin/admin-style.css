@@ -300,3 +300,8 @@ header .subtitle {
         text-align: center;
     }
 }
+/* Add this to admin/admin-style.css */
+#closing-comment-section {
+    display: none; /* Hidden by default */
+    margin-top: 20px;
+}
