@@ -1,0 +1,302 @@
+/* admin/admin-style.css */
+
+/* General Body and Container */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f7f9;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    color: #333;
+}
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    margin-bottom: 30px;
+    position: relative;
+}
+
+header h1 {
+    font-size: 2.2em;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+header .subtitle {
+    font-size: 1.1em;
+    color: #7f8c8d;
+    margin-top: 0;
+}
+
+.welcome-message {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.logout-link {
+    color: #007bff;
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.logout-link:hover {
+    text-decoration: underline;
+}
+
+/* Card Styling */
+.card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Error/Info Messages */
+.error-message {
+    color: #e74c3c;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.info-message {
+    text-align: center;
+    color: #7f8c8d;
+    padding: 20px;
+    font-size: 1.1em;
+}
+
+/* Filter and Search Bar */
+.filter-search-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; /* Align items to the bottom */
+    margin-bottom: 30px;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 20px; /* Space between filter and search groups */
+}
+
+.filter-group, .search-group {
+    display: flex;
+    flex-direction: column; /* Stack label and input */
+    align-items: flex-start;
+}
+
+.filter-group label, .search-group label {
+    font-size: 0.9em;
+    color: #5e6c84;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.filter-select, .search-group input[type="text"] {
+    padding: 10px 15px;
+    border: 1px solid #dfe1e6;
+    border-radius: 5px;
+    font-size: 1em;
+    color: #333;
+    transition: border-color 0.2s;
+    min-width: 180px; /* Ensure select has a decent width */
+}
+
+.filter-select:focus, .search-group input[type="text"]:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.search-group {
+    flex-grow: 1; /* Allow search input to take available space */
+    flex-direction: row; /* Input and button side-by-side */
+    align-items: center; /* Vertically align input and button */
+    position: relative;
+}
+
+.search-group input[type="text"] {
+    flex-grow: 1;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    padding-right: 45px; /* Space for icon/button inside if needed */
+}
+
+.search-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 11px 20px; /* Adjust padding to match input height */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+}
+
+.search-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Ticket Queue Table */
+.ticket-queue table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.ticket-queue th, .ticket-queue td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e2e6ea;
+}
+
+.ticket-queue th {
+    background-color: #f8f9fa;
+    color: #5e6c84;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.ticket-queue tbody tr:hover {
+    background-color: #f0f4f7;
+}
+
+.ticket-queue tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Status Badges */
+.status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-align: center;
+    min-width: 80px;
+}
+
+.status-open {
+    background-color: #e0f2f1; /* Light Teal */
+    color: #26a69a; /* Dark Teal */
+}
+
+.status-inprogress {
+    background-color: #fffde7; /* Light Yellow */
+    color: #ffb300; /* Dark Yellow */
+}
+
+.status-closed {
+    background-color: #e8f5e9; /* Light Green */
+    color: #4caf50; /* Dark Green */
+}
+
+/* Action Button */
+.action-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+
+.action-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Modal Styling (Basic, will be expanded) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 700px;
+    position: relative;
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .dashboard-container {
+        margin: 20px auto;
+        padding: 10px;
+    }
+
+    header h1 {
+        font-size: 1.8em;
+    }
+
+    .filter-search-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-group input[type="text"],
+    .search-btn {
+        width: 100%;
+        border-radius: 5px; /* Reset border radius for full width */
+        margin-top: 10px;
+    }
+
+    .ticket-queue th, .ticket-queue td {
+        padding: 8px 10px;
+        font-size: 0.85em;
+    }
+
+    .welcome-message {
+        position: static;
+        display: block;
+        margin-top: 15px;
+        text-align: center;
+    }
+}

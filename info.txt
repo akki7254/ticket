@@ -1,0 +1,1 @@
+the username admin and the password password123. The password is securely hashed

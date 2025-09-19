@@ -7,7 +7,7 @@ $dbPass = '';
 
 // --- General Config ---
 header('Content-Type: application/json');
-$uploadDir = 'uploads/';
+$uploadDir = 'attachment/';
 $attachmentPath = null;
 
 // --- Database Connection ---
