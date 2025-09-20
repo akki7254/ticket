@@ -100,53 +100,68 @@ async function openTicketDetailModal(ticketId) {
     currentTicketId = ticketId;
     const modal = document.getElementById('ticket-detail-modal');
     modal.style.display = 'flex';
-    // You can add a more robust loading state here if you wish
-
-    // Fetch the specific details for this ticket
-    const response = await fetch(`fetch_ticket_details.php?id=${ticketId}`);
-    const data = await response.json();
-    const { ticket, comments } = data;
-
-    // Populate the modal with data
-    document.getElementById('modal-ticket-id').textContent = `Ticket #${ticket.id} Details`;
     
-    const statusDisplay = document.getElementById('modal-status-display');
-    statusDisplay.textContent = ticket.status;
-    statusDisplay.className = `status status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`;
-
-    document.getElementById('modal-requester').textContent = ticket.name;
-    document.getElementById('modal-email').textContent = ticket.email;
-    document.getElementById('modal-phone').textContent = ticket.phone;
-    document.getElementById('modal-date').textContent = new Date(ticket.created_at).toLocaleString('en-IN');
-    document.getElementById('modal-subject').textContent = ticket.subject;
-
-    // Render the conversation history
-    document.getElementById('modal-conversation-history').innerHTML = renderComments(comments);
+    // Display a loading message
+    modal.querySelector('#modal-ticket-id').textContent = 'Loading...';
+    modal.querySelector('#modal-conversation-history').innerHTML = '';
     
-    // --- Logic for conditional comment box ---
-    const statusSelect = document.getElementById('modal-change-status');
-    const closingCommentSection = document.getElementById('closing-comment-section');
-    const updateButton = document.getElementById('modal-update-button');
-
-    statusSelect.value = ticket.status;
-    closingCommentSection.style.display = 'none';
-    updateButton.textContent = 'Update Status';
-
-    statusSelect.onchange = function() {
-        if (this.value === 'Closed') {
-            closingCommentSection.style.display = 'block';
-            updateButton.textContent = 'Add Comment & Close';
-        } else {
-            closingCommentSection.style.display = 'none';
-            updateButton.textContent = 'Update Status';
+    try {
+        const response = await fetch(`fetch_ticket_details.php?id=${ticketId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch ticket details.');
         }
-    };
-    
-    // Attach event listeners for modal buttons
-    document.querySelector('.close-button').onclick = () => modal.style.display = 'none';
-    updateButton.onclick = () => handleUpdateTicket();
+        
+        const data = await response.json();
+        const { ticket, comments } = data;
+
+        // Populate the modal with the fetched data
+        modal.querySelector('#modal-ticket-id').textContent = `Ticket #${ticket.id} Details`;
+        
+        const statusDisplay = modal.querySelector('#modal-status-display');
+        statusDisplay.textContent = ticket.status;
+        statusDisplay.className = `status status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`;
+
+        modal.querySelector('#modal-requester').textContent = ticket.name;
+        modal.querySelector('#modal-email').textContent = ticket.email;
+        modal.querySelector('#modal-phone').textContent = ticket.phone;
+        modal.querySelector('#modal-date').textContent = new Date(ticket.created_at).toLocaleString('en-IN');
+        modal.querySelector('#modal-subject').textContent = ticket.subject;
+
+        modal.querySelector('#modal-conversation-history').innerHTML = renderComments(comments);
+        
+        const statusSelect = modal.querySelector('#modal-change-status');
+        const updateButton = modal.querySelector('#modal-update-button');
+        const closingCommentSection = modal.querySelector('#closing-comment-section');
+
+        statusSelect.value = ticket.status;
+        
+        // --- THIS FUNCTION CALL FIXES THE LOGIC ---
+        updateModalUI(statusSelect.value); // Set initial state of comment box and button
+
+        statusSelect.onchange = () => updateModalUI(statusSelect.value);
+        updateButton.onclick = () => handleUpdateTicket();
+        modal.querySelector('.close-button').onclick = () => modal.style.display = 'none';
+
+    } catch (error) {
+        console.error("Error opening modal:", error);
+        modal.querySelector('#modal-ticket-id').textContent = 'Error';
+        modal.querySelector('#modal-conversation-history').innerHTML = '<p style="color:red;">Could not load ticket details.</p>';
+    }
 }
 
+function updateModalUI(status) {
+    const modal = document.getElementById('ticket-detail-modal');
+    const closingCommentSection = modal.querySelector('#closing-comment-section');
+    const updateButton = modal.querySelector('#modal-update-button');
+
+    if (status === 'Closed') {
+        closingCommentSection.style.display = 'block';
+        updateButton.textContent = 'Add Comment & Close';
+    } else {
+        closingCommentSection.style.display = 'none';
+        updateButton.textContent = 'Update Status';
+    }
+}
 
 function renderComments(comments) {
     if (!comments || comments.length === 0) return '<p class="info-message">No conversation history.</p>';
@@ -165,9 +180,9 @@ function renderComments(comments) {
 
 async function handleUpdateTicket() {
     const modal = document.getElementById('ticket-detail-modal');
-    const newStatus = document.getElementById('modal-change-status').value;
-    const closingComment = document.getElementById('modal-closing-comment').value.trim();
-    const updateButton = document.getElementById('modal-update-button');
+    const newStatus = modal.querySelector('#modal-change-status').value;
+    const closingComment = modal.querySelector('#modal-closing-comment').value.trim();
+    const updateButton = modal.querySelector('#modal-update-button');
 
     if (newStatus === 'Closed' && !closingComment) {
         alert('A closing comment is required to close the ticket.');
@@ -189,12 +204,12 @@ async function handleUpdateTicket() {
         
         alert('Ticket updated successfully!');
         modal.style.display = 'none';
-        fetchAndRenderTickets(); // Refresh the main list
+        fetchAndRenderTickets();
 
     } catch (error) {
         alert(`Error: ${error.message}`);
     } finally {
         updateButton.disabled = false;
-        // The button text will be reset the next time the modal is opened.
+        // Button text will be reset when modal is next opened
     }
 }

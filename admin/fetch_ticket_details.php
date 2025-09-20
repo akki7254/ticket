@@ -1,36 +1,41 @@
 <?php
-// admin/fetch_all_tickets.php
+// admin/fetch_ticket_details.php
 session_start();
 if (!isset($_SESSION['admin_id'])) {
-    http_response_code(401); // Unauthorized
-    echo json_encode(['error' => 'Admin not logged in.']);
+    http_response_code(401);
     exit();
 }
 
-// --- Database Configuration ---
 $dbHost = 'localhost';
-$dbName = 'tickets';
+$dbName = 'ticket';
 $dbUser = 'root';
 $dbPass = '';
 header('Content-Type: application/json');
+
+$ticketId = $_GET['id'] ?? 0;
+if (!$ticketId) {
+    http_response_code(400);
+    exit();
+}
 
 try {
     $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Fetch all tickets, sorting by status first, then by the newest date
-    $stmt = $pdo->query("
-        SELECT * FROM tickets 
-        ORDER BY 
-            FIELD(status, 'Open', 'In Progress', 'Closed'), 
-            created_at DESC
-    ");
-    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Only fetches from the 'tickets' table now
+    $stmt = $pdo->prepare("SELECT * FROM tickets WHERE id = ?");
+    $stmt->execute([$ticketId]);
+    $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$ticket) {
+        http_response_code(404);
+        exit();
+    }
     
-    echo json_encode($tickets);
+    // The response is now simpler
+    echo json_encode(['ticket' => $ticket]);
 
 } catch (PDOException $e) {
     http_response_code(500);
-    // For debugging, you can be more specific:
-    echo json_encode(['error' => 'Database query failed: ' . $e->getMessage()]);
+    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
 }
