@@ -16,7 +16,7 @@ header('Content-Type: application/json');
 // --- Receive Data ---
 $ticketId = $_POST['ticket_id'] ?? 0;
 $newStatus = $_POST['status'] ?? '';
-$commentText = $_POST['comment'] ?? '';
+$commentText = $_POST['reply_text'] ?? '';
 
 if (empty($ticketId) || empty($newStatus)) {
     http_response_code(400);
