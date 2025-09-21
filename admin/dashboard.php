@@ -7,12 +7,14 @@ if (!isset($_SESSION['admin_id'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard - Support Tickets</title>
     <link rel="stylesheet" href="admin-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="dashboard-container">
         <header>
@@ -51,7 +53,7 @@ if (!isset($_SESSION['admin_id'])) {
                         </tr>
                     </thead>
                     <tbody id="ticket-queue-body">
-                        </tbody>
+                    </tbody>
                 </table>
                 <p id="no-tickets-message" class="info-message" style="display: none;">No tickets found matching your criteria.</p>
             </div>
@@ -59,44 +61,49 @@ if (!isset($_SESSION['admin_id'])) {
     </div>
 
     <div id="ticket-detail-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-button">&times;</span>
-        <div id="modal-header">
-            <h2 id="modal-ticket-id">Ticket #XXXXX Details</h2>
-            <span id="modal-status-display" class="status"></span>
-        </div>
-        
-        <div class="modal-body">
-            <div class="ticket-info-grid">
-                <p><strong>Requester:</strong> <span id="modal-requester"></span></p>
-                <p><strong>Email:</strong> <span id="modal-email"></span></p>
-                <p><strong>Phone:</strong> <span id="modal-phone"></span></p>
-                <p><strong>Date Created:</strong> <span id="modal-date"></span></p>
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div id="modal-header">
+                <h2 id="modal-ticket-id">Ticket #XXXXX Details</h2>
+                <span id="modal-status-display" class="status"></span>
             </div>
-            <p class="ticket-subject"><strong>Subject:</strong> <span id="modal-subject"></span></p>
 
-            <h3 class="history-title">Conversation History:</h3>
-            <div id="modal-conversation-history">
+            <div class="modal-body">
+                <div class="ticket-info-grid">
+                    <p><strong>Requester:</strong> <span id="modal-requester"></span></p>
+                    <p><strong>Email:</strong> <span id="modal-email"></span></p>
+                    <p><strong>Phone:</strong> <span id="modal-phone"></span></p>
+                    <p><strong>Date Created:</strong> <span id="modal-date"></span></p>
+                </div>
+                <p class="ticket-subject"><strong>Subject:</strong> <span id="modal-subject"></span></p>
+
+                <h3 class="history-title">Original Description:</h3>
+                <div id="modal-description-area">
                 </div>
 
-            <div id="closing-comment-section" class="form-group">
-                <label for="modal-closing-comment">Closing Comment (Required):</label>
-                <textarea id="modal-closing-comment" name="comment_text" rows="4" placeholder="Add a final comment before closing..."></textarea>
-            </div>
+                <h3 class="history-title">Attachment:</h3>
+                <div id="modal-attachment-area">
+                </div>
 
-            <div class="form-group action-group">
-                <label for="modal-change-status">Set New Status:</label>
-                <select id="modal-change-status" name="status" class="filter-select">
-                    <option value="Open">Open</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Closed">Closed</option>
-                </select>
-                <button id="modal-update-button" class="action-btn">Update Status</button>
+                <div id="closing-comment-section" class="form-group">
+                    <label for="modal-closing-comment">Closing Comment (Required):</label>
+                    <textarea id="modal-closing-comment" name="comment_text" rows="4" placeholder="Add a final comment before closing..."></textarea>
+                </div>
+
+                <div class="form-group action-group">
+                    <label for="modal-change-status">Set New Status:</label>
+                    <select id="modal-change-status" name="status" class="filter-select">
+                        <option value="Open">Open</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                    <button id="modal-update-button" class="action-btn">Update Status</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <script src="admin-script.js"></script>
 </body>
+
 </html>
