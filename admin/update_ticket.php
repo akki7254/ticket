@@ -16,7 +16,7 @@ header('Content-Type: application/json');
 // --- Receive Data ---
 $ticketId = $_POST['ticket_id'] ?? 0;
 $newStatus = $_POST['status'] ?? '';
-$commentText = $_POST['reply_text'] ?? '';
+$commentText = $_POST['comment'] ?? ''; // <-- This now correctly reads 'comment'
 
 if (empty($ticketId) || empty($newStatus)) {
     http_response_code(400);
@@ -29,17 +29,24 @@ try {
     $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // --- Update the ticket in the database ---
+    // --- Prepare the SQL Query ---
     $sql = "UPDATE tickets SET status = ?, admin_comment = ? WHERE id = ?";
     $stmt = $pdo->prepare($sql);
     
-    // Only save the comment if the status is 'Closed'
-    // If the status is not 'Closed', keep the existing comment
-    $commentToSave = ($newStatus === 'Closed') ? $commentText : null; 
+    // --- Determine what to save in the admin_comment column ---
+    $commentToSave = null;
+    if ($newStatus === 'Closed') {
+        // If closing, save the new comment.
+        $commentToSave = $commentText;
+    } else {
+        // If not closing, we need to preserve the existing comment (if any).
+        $currentTicketStmt = $pdo->prepare("SELECT admin_comment FROM tickets WHERE id = ?");
+        $currentTicketStmt->execute([$ticketId]);
+        $currentTicket = $currentTicketStmt->fetch(PDO::FETCH_ASSOC);
+        $commentToSave = $currentTicket['admin_comment'];
+    }
     
-    // If you want to PRESERVE old comments when changing to a non-closed status,
-    // you would need an extra query. This version clears the comment if not closing.
-
+    // Execute the final update
     $stmt->execute([$newStatus, $commentToSave, $ticketId]);
 
     echo json_encode(['success' => true, 'message' => 'Ticket updated successfully.']);

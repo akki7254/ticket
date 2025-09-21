@@ -1,52 +1,57 @@
+// This global variable is needed to store ticket data for the modal
+let userTickets = []; 
+
 // --- Main execution block that runs when the page is ready ---
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Get user's email from the URL and pre-fill the form
-    const params = new URLSearchParams(window.location.search);
-    const userEmail = params.get('email');
-
-    if (!userEmail) {
-        window.location.href = 'index.html';
-        return;
-    }
-
-    const emailInput = document.getElementById('email');
-    emailInput.value = userEmail;
-    
-    // --- THIS LINE LOCKS THE FIELD ---
-    // It visually grays out the field and makes it unclickable.
-    emailInput.disabled = true;
-    
-    // 2. Asynchronously load data for the page
     populateCountryCodes();
-    fetchTicketHistory(userEmail);
-
-    // 3. Set up the form submission handler
+    fetchTicketHistory();
     setupFormSubmitHandler();
+    fetchAndSetUserEmail(); 
 });
 
+/**
+ * Fetches the logged-in user's email from the session via a PHP script
+ * and populates and locks the email field.
+ */
+async function fetchAndSetUserEmail() {
+    try {
+        const response = await fetch('get_user_email.php'); 
+        const data = await response.json();
+        if (data.email) {
+            const emailInput = document.getElementById('email');
+            emailInput.value = data.email;
+            emailInput.disabled = true;
+        } else {
+            window.location.href = 'index.html';
+        }
+    } catch (error) {
+        console.error('Could not fetch user session.', error);
+        window.location.href = 'index.html';
+    }
+}
 
 /**
  * Fetches ticket history from the backend and populates the table.
- * @param {string} email - The user's email address.
  */
-async function fetchTicketHistory(email) {
+async function fetchTicketHistory() {
     const ticketTableBody = document.getElementById('ticket-history-body');
     const noTicketsMessage = document.getElementById('no-tickets-message');
     
     try {
-        const response = await fetch(`fetch_tickets.php?email=${encodeURIComponent(email)}`);
+        const response = await fetch('fetch_tickets.php'); 
         if (!response.ok) throw new Error('Network response was not ok');
-        const tickets = await response.json();
+        
+        userTickets = await response.json(); 
         
         ticketTableBody.innerHTML = '';
 
-        if (tickets.length === 0) {
+        if (userTickets.length === 0) {
             noTicketsMessage.style.display = 'block';
         } else {
             noTicketsMessage.style.display = 'none';
-            tickets.forEach(ticket => {
+            userTickets.forEach(ticket => {
                 const row = document.createElement('tr');
-                const ticketDate = new Date(ticket.date).toLocaleDateString('en-IN', {
+                const ticketDate = new Date(ticket.created_at).toLocaleDateString('en-IN', {
                     day: 'numeric', month: 'short', year: 'numeric'
                 });
 
@@ -55,22 +60,73 @@ async function fetchTicketHistory(email) {
                     <td>${ticket.subject}</td>
                     <td>${ticketDate}</td>
                     <td><span class="status status-${ticket.status.toLowerCase()}">${ticket.status}</span></td>
+                    <td><button class="view-btn" data-ticket-id="${ticket.id}">View</button></td>
                 `;
                 ticketTableBody.appendChild(row);
+            });
+
+            document.querySelectorAll('.view-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    openUserTicketModal(this.dataset.ticketId);
+                });
             });
         }
     } catch (error) {
         console.error("Error fetching ticket history:", error);
-        ticketTableBody.innerHTML = `<tr><td colspan="4" style="color: red; text-align: center;">Could not load ticket history.</td></tr>`;
+        ticketTableBody.innerHTML = `<tr><td colspan="5" style="color: red; text-align: center;">Could not load ticket history.</td></tr>`;
     }
 }
 
+/**
+ * Opens a modal to show the details of a specific ticket.
+ * @param {string} ticketId - The ID of the ticket to view.
+ */
+function openUserTicketModal(ticketId) {
+    const ticket = userTickets.find(t => t.id == ticketId);
+    if (!ticket) return;
+
+    const modal = document.getElementById('user-ticket-modal');
+    
+    modal.querySelector('#modal-ticket-id').textContent = `Ticket #${ticket.id}`;
+    modal.querySelector('#modal-subject').textContent = ticket.subject;
+    
+    const statusDisplay = modal.querySelector('#modal-status-display');
+    statusDisplay.textContent = ticket.status;
+    statusDisplay.className = `status status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`;
+
+    modal.querySelector('#modal-requester').textContent = ticket.name;
+    modal.querySelector('#modal-email').textContent = ticket.email;
+    modal.querySelector('#modal-phone').textContent = ticket.phone;
+    modal.querySelector('#modal-date').textContent = new Date(ticket.created_at).toLocaleString('en-IN');
+
+    const descriptionArea = modal.querySelector('#modal-description-area');
+    descriptionArea.innerHTML = `<div class="comment-body">${ticket.description.replace(/\n/g, '<br>')}</div>`;
+    
+    const attachmentArea = modal.querySelector('#modal-attachment-area');
+    if (ticket.attachment_path) {
+        attachmentArea.innerHTML = `<a href="${ticket.attachment_path}" target="_blank" class="attachment-link">Download Attachment</a>`;
+    } else {
+        attachmentArea.innerHTML = `<p class="info-message">No attachment was provided.</p>`;
+    }
+
+    const adminCommentArea = modal.querySelector('#modal-admin-comment-area');
+    if (ticket.admin_comment) {
+        adminCommentArea.innerHTML = `<div class="comment-body">${ticket.admin_comment.replace(/\n/g, '<br>')}</div>`;
+    } else {
+        adminCommentArea.innerHTML = `<p class="info-message">No admin comment has been added yet.</p>`;
+    }
+
+    modal.style.display = 'block';
+
+    modal.querySelector('.close-button').onclick = function() {
+        modal.style.display = 'none';
+    }
+}
 
 /**
- * Fetches country codes from an API and populates the dropdown.
+ * Fetches country codes from an API.
  */
 async function populateCountryCodes() {
-    // This function remains unchanged
     const selectElement = document.getElementById('country-code');
     selectElement.innerHTML = '<option>Loading...</option>';
     try {
@@ -88,7 +144,6 @@ async function populateCountryCodes() {
             if (country.idd && country.idd.root) {
                 const dialCode = country.idd.root + (country.idd.suffixes ? country.idd.suffixes[0] : '');
                 if (dialCode === '') return;
-
                 const option = document.createElement('option');
                 option.value = dialCode;
                 option.textContent = `${country.cca2} (${dialCode})`;
@@ -104,12 +159,11 @@ async function populateCountryCodes() {
     }
 }
 
-
 /**
- * Attaches an event listener to the main form to handle ticket submission.
+ * Handles the form submission.
  */
 function setupFormSubmitHandler() {
-    const ticketForm = document.querySelector('main.card form');
+    const ticketForm = document.getElementById('ticket-form');
     const successMessageDiv = document.getElementById('success-message');
 
     ticketForm.addEventListener('submit', async function(event) {
@@ -118,16 +172,10 @@ function setupFormSubmitHandler() {
         submitButton.disabled = true;
         submitButton.textContent = 'Submitting...';
 
-        // --- NEW LOGIC ADDED HERE ---
-        // Temporarily re-enable the email field so its value is included in the form data
         const emailInput = document.getElementById('email');
         emailInput.disabled = false;
-
         const formData = new FormData(ticketForm);
-        
-        // Disable it again immediately after grabbing the data
         emailInput.disabled = true;
-        // --- END NEW LOGIC ---
 
         try {
             const response = await fetch('create_ticket.php', {
@@ -136,13 +184,14 @@ function setupFormSubmitHandler() {
             });
 
             if (!response.ok) {
-                const errorResult = await response.json().catch(() => null);
-                throw new Error(errorResult?.message || 'Server responded with an error.');
+                const errorResult = await response.json().catch(() => ({ message: 'Server responded with an error.' }));
+                throw new Error(errorResult.message);
             }
 
             const result = await response.json();
             
-            fetchTicketHistory(formData.get('email'));
+            fetchTicketHistory(); // Refresh history
+
             ticketForm.style.display = 'none';
             successMessageDiv.style.display = 'block';
 
@@ -159,9 +208,7 @@ function setupFormSubmitHandler() {
                 successMessageDiv.style.display = 'none';
                 ticketForm.style.display = 'block';
                 ticketForm.reset();
-                
-                emailInput.value = new URLSearchParams(window.location.search).get('email');
-                emailInput.disabled = true; // Re-lock the field
+                fetchAndSetUserEmail();
                 populateCountryCodes();
             });
 
