@@ -1,16 +1,12 @@
 <?php
 // config.php
 
-// --- Database Credentials ---
-define('DB_HOST', 'localhost');
+// --- Azure MySQL Database Credentials ---
+define('DB_HOST', 'anan.mysql.database.azure.com');
 define('DB_NAME', 'ticket');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-
-// --- Error Reporting (Useful for development) ---
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+define('DB_USER', 'Akash');
+define('DB_PASS', 'main@25802580'); // <-- YOUR CORRECT PASSWORD
+define('DB_PORT', '3306');
 
 /**
  * Creates and returns a new PDO database connection object.
@@ -18,17 +14,24 @@ error_reporting(E_ALL);
  */
 function getDbConnection() {
     try {
+        // --- SECURE SSL Options for Azure ---
+        $ssl_options = [
+            PDO::MYSQL_ATTR_SSL_CA => __DIR__ . '/DigiCertGlobalRootG2.crt.pem',
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true,
+        ];
+        
         $pdo = new PDO(
-            "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8",
+            "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME,
             DB_USER,
-            DB_PASS
+            DB_PASS,
+            $ssl_options
         );
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $pdo;
+
     } catch (PDOException $e) {
-        // For a real application, you would log this error and show a generic message.
         http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Database connection failed.']);
+        echo json_encode(['success' => false, 'message' => 'Database connection failed: ' . $e->getMessage()]);
         exit();
     }
 }

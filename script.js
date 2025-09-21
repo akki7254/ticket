@@ -22,11 +22,12 @@ async function fetchAndSetUserEmail() {
             emailInput.value = data.email;
             emailInput.disabled = true;
         } else {
+            // If no email in session, user is not logged in, redirect
             window.location.href = 'index.html';
         }
     } catch (error) {
         console.error('Could not fetch user session.', error);
-        window.location.href = 'index.html';
+        window.location.href = 'index.html'; // Redirect on error
     }
 }
 
@@ -88,7 +89,6 @@ function openUserTicketModal(ticketId) {
     const modal = document.getElementById('user-ticket-modal');
     
     modal.querySelector('#modal-ticket-id').textContent = `Ticket #${ticket.id}`;
-    modal.querySelector('#modal-subject').textContent = ticket.subject;
     
     const statusDisplay = modal.querySelector('#modal-status-display');
     statusDisplay.textContent = ticket.status;
@@ -98,6 +98,7 @@ function openUserTicketModal(ticketId) {
     modal.querySelector('#modal-email').textContent = ticket.email;
     modal.querySelector('#modal-phone').textContent = ticket.phone;
     modal.querySelector('#modal-date').textContent = new Date(ticket.created_at).toLocaleString('en-IN');
+    modal.querySelector('#modal-subject').textContent = ticket.subject;
 
     const descriptionArea = modal.querySelector('#modal-description-area');
     descriptionArea.innerHTML = `<div class="comment-body">${ticket.description.replace(/\n/g, '<br>')}</div>`;

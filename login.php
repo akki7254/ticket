@@ -1,11 +1,13 @@
 <?php
-// Always start the session at the very top of the file
+// login.php
+
+// This MUST be the very first line in the file.
 session_start();
 
-// Check if the form was submitted and if the email is not empty
-if (isset($_POST['email']) && !empty($_POST['email'])) {
+// Check if the form was submitted via POST and if the email is not empty
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['email'])) {
     
-    // Store the user's email in the session
+    // Store the user's email in the session variable
     $_SESSION['user_email'] = $_POST['email'];
     
     // Redirect the user to the ticket page
@@ -13,7 +15,7 @@ if (isset($_POST['email']) && !empty($_POST['email'])) {
     exit(); // Important to stop the script after redirecting
 
 } else {
-    // If no email was submitted, send them back to the login page
+    // If something went wrong, send them back to the login page
     header('Location: index.html');
     exit();
 }
