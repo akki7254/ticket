@@ -7,16 +7,18 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-$dbHost = 'localhost';
-$dbName = 'ticket';
-$dbUser = 'root';
-$dbPass = '';
+// --- Centralized Database Connection ---
+require_once '../config.php';
+$pdo = getDbConnection();
+
+// --- General Config ---
 header('Content-Type: application/json');
 
-// --- Receive Data ---
+// --- Receive and Validate Data ---
 $ticketId = $_POST['ticket_id'] ?? 0;
 $newStatus = $_POST['status'] ?? '';
-$commentText = $_POST['comment'] ?? ''; // <-- This now correctly reads 'comment'
+// Note: This name must match what your JavaScript sends
+$commentText = $_POST['comment'] ?? ''; 
 
 if (empty($ticketId) || empty($newStatus)) {
     http_response_code(400);
@@ -24,22 +26,18 @@ if (empty($ticketId) || empty($newStatus)) {
     exit();
 }
 
-// --- Database Connection ---
+// --- Update Database ---
 try {
-    $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // --- Prepare the SQL Query ---
     $sql = "UPDATE tickets SET status = ?, admin_comment = ? WHERE id = ?";
     $stmt = $pdo->prepare($sql);
     
-    // --- Determine what to save in the admin_comment column ---
+    // Determine what to save in the admin_comment column
     $commentToSave = null;
     if ($newStatus === 'Closed') {
         // If closing, save the new comment.
         $commentToSave = $commentText;
     } else {
-        // If not closing, we need to preserve the existing comment (if any).
+        // If not closing, preserve the existing comment (if any).
         $currentTicketStmt = $pdo->prepare("SELECT admin_comment FROM tickets WHERE id = ?");
         $currentTicketStmt->execute([$ticketId]);
         $currentTicket = $currentTicketStmt->fetch(PDO::FETCH_ASSOC);

@@ -7,10 +7,12 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-$dbHost = 'localhost';
-$dbName = 'ticket'; // Make sure this is correct
-$dbUser = 'root';
-$dbPass = '';
+// --- Centralized Database Connection ---
+// The path goes UP one directory to the root where config.php is
+require_once '../config.php';
+$pdo = getDbConnection();
+
+// --- General Config ---
 header('Content-Type: application/json');
 
 $ticketId = $_GET['id'] ?? 0;
@@ -20,29 +22,23 @@ if (!$ticketId) {
     exit();
 }
 
+// --- Fetch Data (from the 'tickets' table ONLY) ---
 try {
-    $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    // 1. Get main ticket details
+    // This query now only selects from the tickets table
     $stmt = $pdo->prepare("SELECT * FROM tickets WHERE id = ?");
     $stmt->execute([$ticketId]);
     $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // 2. Get all comments for that ticket
-    $stmt = $pdo->prepare("SELECT * FROM comments WHERE ticket_id = ? ORDER BY created_at ASC");
-    $stmt->execute([$ticketId]);
-    $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (!$ticket) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Ticket not found.']);
+        exit();
+    }
     
-    // Combine them into a single response
-    $response = [
-        'ticket' => $ticket,
-        'comments' => $comments
-    ];
-    
-    echo json_encode($response);
+    // The response is now much simpler and doesn't include a 'comments' array
+    echo json_encode(['ticket' => $ticket]);
 
 } catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Database error: ' ' . $e->getMessage()]);
+    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
 }
