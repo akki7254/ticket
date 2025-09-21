@@ -25,42 +25,53 @@ body {
 
 .container {
     max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
+    margin: 20px auto; /* Reduced margin for mobile */
+    padding: 15px;    /* Reduced padding for mobile */
 }
 
 header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+    position: relative;
 }
 
 header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 2rem; /* Slightly smaller on mobile */
 }
 
-header p {
-    font-size: 1.1rem;
-    color: var(--text-light);
+.welcome-message {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 10px;
+}
+
+.logout-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+.logout-link:hover {
+    text-decoration: underline;
 }
 
 .card {
     background-color: var(--card-background);
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    padding: 30px;
-    margin-bottom: 30px;
+    padding: 20px; /* Reduced padding */
+    margin-bottom: 20px;
 }
 
 h2 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     margin-bottom: 10px;
 }
 
 /* --- Form Styles --- */
 .form-row {
     display: flex;
-    gap: 20px;
+    flex-direction: column; /* Stack by default for mobile-first */
+    gap: 0;
 }
 
 .form-group {
@@ -77,14 +88,14 @@ h2 {
 
 .required-star {
     color: var(--required-star-color);
-    font-weight: 600;
-    margin-left: 2px;
 }
 
 input[type="text"],
 input[type="email"],
+input[type="password"],
 input[type="tel"],
-textarea {
+textarea,
+.phone-input-group select {
     width: 100%;
     padding: 12px;
     border: 1px solid var(--border-color);
@@ -94,23 +105,24 @@ textarea {
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="tel"]:focus,
-textarea:focus {
+input:focus, textarea:focus, select:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.2);
 }
 
-textarea {
-    resize: vertical;
+input:disabled {
+    cursor: not-allowed;
+    background-color: #f4f5f7;
+    color: var(--text-light);
 }
 
-.file-info {
-    font-size: 0.85rem;
-    color: var(--text-light);
-    margin-top: 8px;
+.phone-input-group {
+    display: flex;
+    gap: 10px;
+}
+.phone-input-group select {
+    flex: 0 0 100px; /* Give the country code a fixed width */
 }
 
 .submit-btn {
@@ -125,119 +137,61 @@ textarea {
     cursor: pointer;
     transition: background-color 0.2s;
 }
-
 .submit-btn:hover {
     background-color: var(--primary-hover);
 }
 
-
-/* --- Phone Input Group --- */
-.phone-input-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+/* --- Table Styles --- */
+.ticket-list {
+    overflow-x: auto; /* Allow horizontal scrolling on small screens */
 }
 
-.phone-input-group select {
-    padding: 12px 8px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background-color: #f4f7f9;
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
-    flex-shrink: 0; /* Prevents the select box from shrinking */
-}
-
-.phone-input-group input {
-    width: 100%;
-}
-
-/* --- Responsive Adjustments --- */
-@media (max-width: 600px) {
-    .form-row {
-        flex-direction: column;
-        gap: 0;
-    }
-}
-
-/* --- Add these new rules to the bottom of your style.css --- */
-
-/* Main table styling */
 .ticket-history-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
 }
 
-/* Table header and cell styling */
 .ticket-history-table th,
 .ticket-history-table td {
-    padding: 12px 15px;
+    padding: 12px 10px;
     text-align: left;
     border-bottom: 1px solid #f0f0f0;
-    vertical-align: middle;
+    white-space: nowrap; /* Prevent text wrapping */
 }
 
-/* Header-specific styling */
 .ticket-history-table th {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-light);
     text-transform: uppercase;
 }
 
-/* Status tag styling */
+/* --- Status & Action Styles --- */
 .status {
     padding: 4px 10px;
     border-radius: 12px;
     font-size: 0.8rem;
     font-weight: 600;
-    display: inline-block;
 }
+.status-open { background-color: #e3fcef; color: #067647; }
+.status-in-progress { background-color: #fff0b3; color: #974f0c; }
+.status-closed { background-color: #f4f5f7; color: #5e6c84; }
 
-.status-open {
-    background-color: #e3fcef;
-    color: #067647;
-}
-
-.status-in-progress {
-    background-color: #fff0b3;
-    color: #974f0c;
-}
-
-.status-closed {
-    background-color: #f4f5f7;
-    color: #5e6c84;
-}
-/* --- Add this new rule to your style.css --- */
-
-/* Style for disabled input fields */
-input:disabled {
-    cursor: not-allowed;
-    background-color: #f4f5f7; /* A light grey to show it's inactive */
-    color: #5e6c84;
-}
-
-/* --- Add these new rules to style.css --- */
-
-/* View button in the user's ticket history table */
 .view-btn {
     background-color: #007bff;
     color: white;
     padding: 6px 14px;
     border-radius: 6px;
-    text-decoration: none;
     font-size: 0.9rem;
-    font-weight: 500;
     cursor: pointer;
     border: none;
-    transition: background-color 0.2s;
 }
 .view-btn:hover {
     background-color: #0056b3;
 }
 
-/* Modal styles (can be shared with admin modal if in the same file) */
+/* --- Modal Styles --- */
 .modal {
     display: none;
     position: fixed;
@@ -246,17 +200,15 @@ input:disabled {
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0,0,0,0.5);
     padding-top: 60px;
 }
 .modal-content {
     background-color: #fefefe;
-    margin: 5% auto;
-    padding: 30px;
+    margin: 10% auto;
+    padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    width: 80%;
+    width: 90%;
     max-width: 600px;
     position: relative;
 }
@@ -275,12 +227,7 @@ input:disabled {
     border-top: 1px solid #eee;
     padding-top: 15px;
 }
-.modal-body p {
-    margin-bottom: 10px;
-}
-.info-message {
-    color: #5e6c84;
-}
+.info-message { color: #5e6c84; }
 .attachment-link {
     display: inline-block;
     padding: 8px 12px;
@@ -290,21 +237,29 @@ input:disabled {
     color: #007bff;
     font-weight: 500;
 }
-/* Add this to your style.css */
-header {
-    position: relative; /* Needed to position the welcome message */
-}
-.welcome-message {
-    position: absolute;
-    top: 0;
-    right: 0;
-    font-size: 0.9em;
-    color: #555;
-}
-.logout-link {
-    color: #007bff;
-    text-decoration: none;
-}
-.logout-link:hover {
-    text-decoration: underline;
+
+
+/* --- Laptop/Desktop Adjustments (Large Screens) --- */
+@media (min-width: 768px) {
+    .container {
+        margin: 40px auto;
+        padding: 20px;
+    }
+    header h1 {
+        font-size: 2.5rem;
+    }
+    .welcome-message {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin-top: 0;
+    }
+    .card {
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    .form-row {
+        flex-direction: row; /* Side-by-side on large screens */
+        gap: 20px;
+    }
 }
