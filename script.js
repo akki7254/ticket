@@ -202,7 +202,9 @@ function setupFormSubmitHandler() {
                     Your Ticket ID is <strong>#${result.ticketId}</strong>. 
                     Our support team will get back to you as soon as possible.
                 </p>
-                <button id="submit-another-btn" class="submit-btn" style="margin-top: 20px;">Submit Another Ticket</button>
+                <div class="success-buttons">
+                    <button id="submit-another-btn" class="submit-btn">Submit Another Ticket</button>
+                </div>
             `;
             
             document.getElementById('submit-another-btn').addEventListener('click', () => {

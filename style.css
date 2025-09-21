@@ -290,3 +290,21 @@ input:disabled {
     color: #007bff;
     font-weight: 500;
 }
+/* Add this to your style.css */
+header {
+    position: relative; /* Needed to position the welcome message */
+}
+.welcome-message {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.9em;
+    color: #555;
+}
+.logout-link {
+    color: #007bff;
+    text-decoration: none;
+}
+.logout-link:hover {
+    text-decoration: underline;
+}
